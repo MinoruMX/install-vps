@@ -315,3 +315,26 @@ reboot() {
   echo -e "\n✅ ${WHITE}REINICIANDO SERVER${GRAY_LIGHT}\n"
   sudo reboot
 }
+
+backend_update_baileys() {
+  print_banner
+  printf "${WHITE} 💻 Actualizando @whiskeysockets/baileys en backend...${GRAY_LIGHT}"
+  printf "\n\n"
+
+  sleep 2
+
+  cd /home/deploy/${empresa_atualizar}
+
+  sudo -u deploy pm2 stop ${empresa_atualizar}-backend
+
+  cd /home/deploy/${empresa_atualizar}/backend
+
+  sudo -u deploy npm install @whiskeysockets/baileys@latest --loglevel=error
+
+  sudo -u deploy npm run build
+
+  sudo -u deploy pm2 restart ${empresa_atualizar}-backend
+  sudo -u deploy pm2 save
+
+  sleep 2
+}

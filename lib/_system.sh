@@ -539,6 +539,30 @@ system_certbot_setup() {
   sleep 2
 }
 
+system_self_update() {
+  print_banner
+  printf "${WHITE} 💻 Verificando actualizaciones del instalador...${GRAY_LIGHT}\n\n"
+  cd "$PROJECT_ROOT" || return 0
+  git config --global --add safe.directory "$PROJECT_ROOT"
+  git fetch --quiet || true
+  local_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  local_hash=$(git rev-parse HEAD 2>/dev/null)
+  remote_hash=$(git rev-parse origin/$local_branch 2>/dev/null || git rev-parse @{u} 2>/dev/null)
+  if [ -n "$remote_hash" ] && [ "$local_hash" != "$remote_hash" ]; then
+    printf "${YELLOW} ⚠️ Hay una nueva versión disponible.${GRAY_LIGHT}\n\n"
+    read -p "> ¿Deseas actualizar ahora? (s/N) " resp
+    resp=${resp:-N}
+    if [[ "$resp" =~ ^[sS]$ ]]; then
+      git reset --hard "origin/$local_branch" || git pull --ff-only
+      printf "\n✅ ${WHITE}Instalador actualizado.${GRAY_LIGHT}\n\n"
+    else
+      printf "\n➡️  Continuando sin actualizar.${GRAY_LIGHT}\n\n"
+    fi
+  else
+    printf "✅ ${WHITE}Ya estás en la última versión.${GRAY_LIGHT}\n\n"
+  fi
+}
+
 backend_logs() {
   print_banner
   printf "${WHITE} 💻 Logs Backend...${GRAY_LIGHT}"
@@ -663,19 +687,19 @@ backend_build() {
 
 frontend_build() {
   print_banner
-  printf "${WHITE} 💻 BUILD BACKEND...${GRAY_LIGHT}"
+  printf "${WHITE} 💻 BUILD FRONTEND...${GRAY_LIGHT}"
   printf "\n\n"
 
   sleep 2
   FRONT_PATH="/home/deploy/${instancia_add}/frontend"
-
-  echo -e "\n🔧 Backend:"
-  cd "$FRONT_PATH" || { echo "❌ No se pudo acceder al backend en $BACK_PATH"; return 1; }
+  
+  echo -e "\n🔧 Frontend:"
+  cd "$FRONT_PATH" || { echo "❌ No se pudo acceder al frontend en $FRONT_PATH"; return 1; }
 
   echo "🧹 Limpiando build anterior..."
   sudo -u deploy rm -rf build
   sleep 2
-  echo "🏗️  Construyendo nueva versión del backend..."
+  echo "🏗️  Construyendo nueva versión del frontend..."
   sudo -u deploy npm run build
   sleep 2
   echo -e "\n✅ ${WHITE}BUILD COMPLETO${GRAY_LIGHT}\n"

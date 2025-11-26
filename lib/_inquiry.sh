@@ -286,6 +286,11 @@ software_fix_502(){
   reboot
 }
 
+software_update_baileys(){
+  get_empresa_atualizar
+  backend_update_baileys
+}
+
 inquiry_options() {
   
   print_banner
@@ -305,6 +310,9 @@ inquiry_options() {
   printf "   [12] Fix - PM2 Services\n"
   printf "   [13] Fix - 502 Bad Gateway\n"
   printf "   [14] Fix - Reinstalar Certificado Certbot\n"
+  printf "   [15] Actualizar paquete Baileys Backend\n"
+  printf "   [20] Actualizar Backend\n"
+  printf "   [21] Actualizar Frontend\n"  
   printf "\n"
   read -p "> " option
 
@@ -363,6 +371,10 @@ inquiry_options() {
       software_certbot
       exit
       ;;   
+    15)
+      software_update_baileys
+      exit
+      ;;
     20) 
       software_backend_build
       exit

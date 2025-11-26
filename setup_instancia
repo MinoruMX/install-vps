@@ -33,6 +33,9 @@ chmod 700 "${PROJECT_ROOT}"/config
 EOF
 source "${PROJECT_ROOT}"/config
 
+# self update
+system_self_update
+
 # interactive CLI
 inquiry_options
 
